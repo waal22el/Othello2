@@ -1,0 +1,36 @@
+﻿<Window x:Class="Othello.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Othello.Views" 
+        xmlns:local1="clr-namespace:Othello.ViewModels"
+        mc:Ignorable="d"
+        Title="OthelloGame" Height="600" Width="600">
+    <Window.DataContext>
+        <local1:GameWindowViewModel />
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="10">
+            <Button Name="NewGameButton" Content="New Game" Margin="5" Command="{Binding NewGameCommand}"/>
+            <StackPanel Width="120" Margin="10,0" VerticalAlignment="Center">
+                <TextBlock Text="{Binding CurrentPlayerName}" FontWeight="Bold" TextAlignment="Center"/>
+                <TextBlock Text="Black Pieces" TextAlignment="Center"/>
+                <TextBlock Text="{Binding BlackScore}" TextAlignment="Center"/>
+            </StackPanel>
+            <StackPanel>
+                <TextBlock Text="Computer" FontWeight="Bold" TextAlignment="Center"/>
+                <TextBlock Text="White Pieces" TextAlignment="Center"/>
+                <TextBlock Text="{Binding WhiteScore}" TextAlignment="Center"/>
+            </StackPanel>
+        </StackPanel>
+
+        <local:GameGrid Grid.Row="1" x:Name="GameGridControl" />
+    </Grid>
+</Window>

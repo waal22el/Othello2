@@ -1,0 +1,11 @@
+﻿<UserControl x:Class="Othello.Views.GameGrid"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Othello.ViewModels"
+             xmlns:models="clr-namespace:Othello.Models"
+             DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+
+    <Grid>
+        <Grid Name="GameBoardGrid" Background="Beige"/>
+    </Grid>
+</UserControl>
