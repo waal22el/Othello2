@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:Othello.ViewModels"
              xmlns:models="clr-namespace:Othello.Models"
-             DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}}">
+             DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext}"
 
     <Grid>
         <Grid Name="GameBoardGrid" Background="Beige"/>
