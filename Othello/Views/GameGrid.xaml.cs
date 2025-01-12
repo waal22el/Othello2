@@ -38,7 +38,9 @@ namespace Othello.Views
                         BorderBrush = Brushes.Black,
                         BorderThickness = new Thickness(1)
                     };
-                    cell.MouseLeftButtonDown += (s, e) => OnTileClicked(row, col);
+                    var rowCopy = row;
+                    var colCopy = col;
+                    cell.MouseLeftButtonDown += (s, e) => OnTileClicked(rowCopy, colCopy);
 
                     Grid.SetRow(cell, row);
                     Grid.SetColumn(cell, col);
@@ -52,7 +54,9 @@ namespace Othello.Views
             if (DataContext is GameWindowViewModel viewModel)
             {
                 viewModel.OnTileClicked(new TileClickEventArgs { Row = row, Column = column });
+                viewModel.NotifyGameGridUpdate(this);
             }
+            
         }
 
         public void UpdateGameBoard(Player.Disk[,] boardState)
@@ -65,6 +69,7 @@ namespace Othello.Views
 
                     if (cell.Child is Ellipse ellipse)
                     {
+                        
                         ellipse.Fill = boardState[row, col] switch
                         {
                             Player.Disk.Black => Brushes.Black,
@@ -86,6 +91,7 @@ namespace Othello.Views
                                 Player.Disk.White => Brushes.White,
                                 _ => Brushes.Transparent
                             }
+
                         };
                     }
                 }

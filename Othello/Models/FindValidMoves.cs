@@ -3,33 +3,34 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Othello.ViewModels.Player;
 
 namespace Othello.Models
 {
     public partial class GameBoard
     {
-        public List<int[]> findValidMoves(int player)
+        public List<int[]> findValidMoves(Disk playerDisk)
         {
-            int opponent;
+            Disk opponentDisk;
             List<int[]> Validmoves = new List<int[]>();
             int[] tryDirection = null;
 
-            if (player == 1) //if the player is white 
+            if (playerDisk == Disk.Black) //if the player is Black 
             {
-                opponent = 2; //opponent is black
+                opponentDisk = Disk.White;
             }
-            else // else player is black
+            else // else player is White
             {
-                opponent = 1; //opponent is white
+                opponentDisk = Disk.Black;
             }
 
             for (int i = 0; i < 8; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    if (this.Board[i, j] == 0) // if the tile is empty start checking valid moves
+                    if (this.Board[i, j] == Disk.Empty) // if the tile is empty start checking valid moves
                     {                          // You cannot place a brick on a tile that already has a brick on it
-                        tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { -1, -1 }, player, opponent, false); // Check NW
+                        tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { -1, -1 }, playerDisk, opponentDisk, false); // Check NW
                         if (tryDirection != null)
                         {
                             Validmoves.Add(tryDirection);
@@ -37,7 +38,7 @@ namespace Othello.Models
 
                         if (tryDirection == null) //if there is already a direction that causes a valid move there is no reason to check the rest
                         {
-                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { -1, 0 }, player, opponent, false); // Check N
+                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { -1, 0 }, playerDisk, opponentDisk, false); // Check N
                             if (tryDirection != null)
                             {
                                 Validmoves.Add(tryDirection);
@@ -46,7 +47,7 @@ namespace Othello.Models
 
                         if (tryDirection == null) //if there is already a direction that causes a valid move there is no reason to check the rest
                         {
-                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { -1, 1 }, player, opponent, false); // Check NE
+                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { -1, 1 }, playerDisk, opponentDisk, false); // Check NE
                             if (tryDirection != null)
                             {
                                 Validmoves.Add(tryDirection);
@@ -55,7 +56,7 @@ namespace Othello.Models
 
                         if (tryDirection == null) //if there is already a direction that causes a valid move there is no reason to check the rest
                         {
-                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { 0, 1 }, player, opponent, false); // Check E
+                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { 0, 1 }, playerDisk, opponentDisk, false); // Check E
                             if (tryDirection != null)
                             {
                                 Validmoves.Add(tryDirection);
@@ -64,7 +65,7 @@ namespace Othello.Models
 
                         if (tryDirection == null) //if there is already a direction that causes a valid move there is no reason to check the rest
                         {
-                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { 1, 1 }, player, opponent, false); // Check SE
+                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { 1, 1 }, playerDisk, opponentDisk, false); // Check SE
                             if (tryDirection != null)
                             {
                                 Validmoves.Add(tryDirection);
@@ -73,7 +74,7 @@ namespace Othello.Models
 
                         if (tryDirection == null) //if there is already a direction that causes a valid move there is no reason to check the rest
                         {
-                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { 1, 0 }, player, opponent, false); // Check S
+                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { 1, 0 }, playerDisk, opponentDisk, false); // Check S
                             if (tryDirection != null)
                             {
                                 Validmoves.Add(tryDirection);
@@ -82,7 +83,7 @@ namespace Othello.Models
 
                         if (tryDirection == null) //if there is already a direction that causes a valid move there is no reason to check the rest
                         {
-                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { 1, -1 }, player, opponent, false); // Check SW
+                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { 1, -1 }, playerDisk, opponentDisk, false); // Check SW
                             if (tryDirection != null)
                             {
                                 Validmoves.Add(tryDirection);
@@ -91,7 +92,7 @@ namespace Othello.Models
 
                         if (tryDirection == null) //if there is already a direction that causes a valid move there is no reason to check the rest
                         {
-                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { 0, -1 }, player, opponent, false); // Check W
+                            tryDirection = CheckValidDirection(new int[] { i, j }, new int[] { 0, -1 }, playerDisk, opponentDisk, false); // Check W
                             if (tryDirection != null)
                             {
                                 Validmoves.Add(tryDirection);
@@ -106,12 +107,12 @@ namespace Othello.Models
             return Validmoves;
         }
 
-        private int[] CheckValidDirection(int[] currentTile, int[] direction, int player, int opponent, bool passedOther)
+        private int[] CheckValidDirection(int[] currentTile, int[] direction, Disk playerDisk, Disk opponentDisk, bool passedOther)
         {
             int[] nextTile = { currentTile[0] + direction[0], currentTile[1] + direction[1] }; // this variable is not strictly needed but improves readability significantly
             try
             {
-                if (this.Board[nextTile[0], nextTile[1]] == player) //if the next tile is the players tile and we have passed a tile of opponent
+                if (this.Board[nextTile[0], nextTile[1]] == playerDisk) //if the next tile is the players tile and we have passed a tile of opponent
                 {
                     if (passedOther) //if we have passed a tile of the opponent it's a valid move
                     {
@@ -122,9 +123,9 @@ namespace Othello.Models
                         return null;
                     }
                 }
-                else if (this.Board[nextTile[0], nextTile[1]] == opponent) //if the next tile is an opponent
+                else if (this.Board[nextTile[0], nextTile[1]] == opponentDisk) //if the next tile is an opponent
                 {
-                    if (CheckValidDirection(nextTile, direction, player, opponent, true) != null) //true because we have now passed our opponent
+                    if (CheckValidDirection(nextTile, direction, playerDisk, opponentDisk, true) != null) //true because we have now passed our opponent
                     {
                         return currentTile;
                     }

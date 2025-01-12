@@ -19,9 +19,9 @@ namespace Othello.ViewModels
             if (validMoves.Count > 0)
             {
                 int index = _random.Next(validMoves.Count);
-                return validMoves[index]; 
+                return validMoves[index];
             }
-            return null; 
+            return Array.Empty<int>(); // Return an empty array instead of null
         }
     }
 }

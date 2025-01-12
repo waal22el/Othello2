@@ -5,7 +5,6 @@ namespace Othello.ViewModels
 {
     public abstract class Player
     {
-        public Models.Player ModelPlayer { get; }
         public enum Disk
         {
             Black,

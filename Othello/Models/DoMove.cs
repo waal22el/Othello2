@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Othello.ViewModels;
 
 namespace Othello.Models
 {
@@ -10,15 +11,15 @@ namespace Othello.Models
     {
         public void DoMove(int[] tile, Player player)
         {
-            int playerColor = player.Color;
-            Board[tile[0], tile[1]] = playerColor; // First adds the player tile to the chosen tile
+            Player.Disk playerDisk = player.PlayerDisk;
+            Board[tile[0], tile[1]] = playerDisk; // First adds the player tile to the chosen tile
             List<int[]> TilesToFlip = new List<int[]>();
 
-            TilesToFlip = FindTilesToFlip(TilesToFlip, tile, playerColor);
+            TilesToFlip = FindTilesToFlip(TilesToFlip, tile, playerDisk);
 
             foreach (int[] tileToFlip in TilesToFlip)
             {
-                Board[tileToFlip[0], tileToFlip[1]] = playerColor;
+                Board[tileToFlip[0], tileToFlip[1]] = playerDisk;
             }
         }
     }

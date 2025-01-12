@@ -3,58 +3,59 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Othello.ViewModels.Player;
 
 namespace Othello.Models
 {
     public partial class GameBoard
     {
-        private List<int[]> FindTilesToFlip(List<int[]> TilesToFlip, int[] tile, int player)
+        private List<int[]> FindTilesToFlip(List<int[]> TilesToFlip, int[] tile, Disk playerDisk)
         {
             List<int[]> tempList = new List<int[]>();
 
-            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, player, new int[] { -1, -1 }); // Check NW
+            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, playerDisk, new int[] { -1, -1 }); // Check NW
             if (tempList != null)
             {
                 TilesToFlip = tempList;
             }
 
-            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, player, new int[] { -1, 0 }); // Check N
+            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, playerDisk, new int[] { -1, 0 }); // Check N
             if (tempList != null)
             {
                 TilesToFlip = tempList;
             }
 
-            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, player, new int[] { -1, 1 }); // Check NE
+            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, playerDisk, new int[] { -1, 1 }); // Check NE
             if (tempList != null)
             {
                 TilesToFlip = tempList;
             }
 
-            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, player, new int[] { 0, 1 }); // Check E
+            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, playerDisk, new int[] { 0, 1 }); // Check E
             if (tempList != null)
             {
                 TilesToFlip = tempList;
             }
 
-            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, player, new int[] { 1, 1 }); // Check SE
+            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, playerDisk, new int[] { 1, 1 }); // Check SE
             if (tempList != null)
             {
                 TilesToFlip = tempList;
             }
 
-            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, player, new int[] { 1, 0 }); // Check S
+            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, playerDisk, new int[] { 1, 0 }); // Check S
             if (tempList != null)
             {
                 TilesToFlip = tempList;
             }
 
-            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, player, new int[] { 1, -1 }); // Check SW
+            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, playerDisk, new int[] { 1, -1 }); // Check SW
             if (tempList != null)
             {
                 TilesToFlip = tempList;
             }
 
-            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, player, new int[] { 0, -1 }); // Check W
+            tempList = FindTilesToFlipRecursion(TilesToFlip, tile, playerDisk, new int[] { 0, -1 }); // Check W
             if (tempList != null)
             {
                 TilesToFlip = tempList;
@@ -63,24 +64,24 @@ namespace Othello.Models
             return TilesToFlip;
         }
 
-        private List<int[]> FindTilesToFlipRecursion(List<int[]> TilesToFlip, int[] currentTile, int player, int[] direction)
+        private List<int[]> FindTilesToFlipRecursion(List<int[]> TilesToFlip, int[] currentTile, Disk playerDisk, int[] direction)
         {
             try
             {
                 int[] nextTile = { currentTile[0] + direction[0], currentTile[1] + direction[1] };
                 List<int[]> tempList = new List<int[]>();
 
-                if (Board[nextTile[0], nextTile[1]] == player) //if the tile we are looking at is the players brick
+                if (Board[nextTile[0], nextTile[1]] == playerDisk) //if the tile we are looking at is the players brick
                 {
                     return TilesToFlip; //stop checking
                 }
-                else if (Board[nextTile[0], nextTile[1]] == 0) //if the next tile is empty
+                else if (Board[nextTile[0], nextTile[1]] == Disk.Empty) //if the next tile is empty
                 {
                     return null;
                 }
                 else //else (if it is opponents brick)
                 {
-                    tempList = FindTilesToFlipRecursion(TilesToFlip, nextTile, player, direction);
+                    tempList = FindTilesToFlipRecursion(TilesToFlip, nextTile, playerDisk, direction);
                     if (tempList != null)
                     {
                         TilesToFlip = tempList;

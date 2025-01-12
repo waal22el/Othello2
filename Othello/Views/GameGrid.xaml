@@ -4,8 +4,13 @@
              xmlns:vm="clr-namespace:Othello.ViewModels"
              xmlns:models="clr-namespace:Othello.Models"
              DataContext="{Binding RelativeSource={RelativeSource AncestorType=Window}, Path=DataContext}"
+<<<<<<< HEAD
+>
+=======
+>>>>>>> 2553c711c8b0ef151ba41dc4625030f7a1213c11
 
     <Grid>
         <Grid Name="GameBoardGrid" Background="Beige"/>
     </Grid>
 </UserControl>
+    

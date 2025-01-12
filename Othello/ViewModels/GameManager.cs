@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Windows.Input;
 using System.Windows;
 using Othello.Views;
+using System.Windows.Controls;
 
 
 
@@ -49,35 +50,48 @@ namespace Othello.ViewModels
         }
         public void NewGame()
         {
-
             var setupDialog = new SetUpGameDialog();
             bool? dialogResult = setupDialog.ShowDialog();
 
             if (dialogResult == true)
             {
+                // Validera input från dialog
+                if (string.IsNullOrWhiteSpace(setupDialog.Player1Name) ||
+                    string.IsNullOrWhiteSpace(setupDialog.Player2Name))
+                {
+                    MessageBox.Show("Player names cannot be empty.");
+                    return;
+                }
+
                 string player1Name = setupDialog.Player1Name;
                 string player2Name = setupDialog.Player2Name;
                 string player1Type = setupDialog.Player1Type;
                 string player2Type = setupDialog.Player2Type;
 
+                // Initiera spelare och starta nytt spel
                 InitializePlayers(player1Name, player2Name, player1Type, player2Type);
-
                 _gameManager.StartNewGame();
-                UpdateGameGrid();
+
+                // Uppdatera UI
                 UpdateScores();
                 CurrentPlayerName = _gameManager.CurrentPlayer.Name;
             }
         }
 
+
         public async void OnTileClicked(TileClickEventArgs e)
         {
+            if (_gameManager.CurrentPlayer == null)
+            {
+                MessageBox.Show("Current player is not set.");
+                return;
+            }
             if (_gameManager.CurrentPlayer is HumanPlayer)
             {
                 var validMove = _gameManager.RequestMove(e.Row, e.Column);
 
                 if (validMove)
                 {
-                    UpdateGameGrid();
                     UpdateScores();
                     await HandleNextTurn(); // Switch turns and handle computer moves if applicable
                 }
@@ -93,13 +107,12 @@ namespace Othello.ViewModels
         }
 
         public class GameManager
+
         {
             private Player _player1; 
             private Player _player2; 
             private GameBoard _gameBoard;
-            private Player _currentPlayer; 
-            private Player.Disk[,] _boardState;
-            private GameManager _gameManager;
+            private Player _currentPlayer;
             
 
             public Player Player1 => _player1;
@@ -111,47 +124,31 @@ namespace Othello.ViewModels
                 _player1 = new HumanPlayer("Player 1", Player.Disk.Black);
                 _player2 = new ComputerPlayer("Player 2", Player.Disk.White);
                 _currentPlayer = _player1;
-                _boardState = new Player.Disk[8, 8];
-                InitializeBoardState();
             }
-            private void InitializeBoardState()
-            {
-                for (int i = 0; i < 8; i++)
-                {
-                    for (int j = 0; j < 8; j++)
-                    {
-                        _boardState[i, j] = Player.Disk.Empty;
-                    }
-                }
-                _boardState[3, 3] = Player.Disk.White;
-                _boardState[3, 4] = Player.Disk.Black;
-                _boardState[4, 3] = Player.Disk.Black;
-                _boardState[4, 4] = Player.Disk.White;
-            }
-
 
             public void StartNewGame()
             {
                 _currentPlayer = _player1;
-                InitializeBoardState();
             }
 
             public bool RequestMove(int row, int column)
             {
-                var diskValue = _currentPlayer.PlayerDisk == Player.Disk.Black ? 0 : 1;
+                if (_currentPlayer == null)
+                {
+                    throw new InvalidOperationException("Current player is not set.");
+                }
 
-                List<int[]> validMoves = _gameBoard.findValidMoves(diskValue);
+                List<int[]> validMoves = _gameBoard.findValidMoves(_currentPlayer.PlayerDisk);
 
                 if (validMoves.Any(m => m[0] == row && m[1] == column))
                 {
-                    _boardState[row, column] = _currentPlayer.PlayerDisk; 
-                    _gameBoard.DoMove(new int[] { row, column }, _currentPlayer.ModelPlayer);
-                    SwitchPlayer();
+                    _gameBoard.DoMove(new int[] { row, column }, _currentPlayer);
                     return true;
                 }
                 MessageBox.Show($"Invalid move at ({row},{column})");
                 return false;
             }
+
 
             public void SwitchPlayer()
             {
@@ -159,16 +156,13 @@ namespace Othello.ViewModels
             }
             public bool IsGameOver()
             {
-                int player1Color = _gameManager.Player1.PlayerDisk == Player.Disk.Black ? 0 : 1;
-                int player2Color = _gameManager.Player2.PlayerDisk == Player.Disk.Black ? 0 : 1;
-
-                return !_gameManager.GameBoard.findValidMoves(player1Color).Any() &&
-                       !_gameManager.GameBoard.findValidMoves(player2Color).Any();
+                return !GameBoard.findValidMoves(Player1.PlayerDisk).Any() &&
+                       !GameBoard.findValidMoves(Player2.PlayerDisk).Any();
             }
             public Player CurrentPlayer => _currentPlayer;
             public Player.Disk[,] GetBoardState()
             {
-                return _boardState;
+                return _gameBoard.Board;
             }
             public GameBoard GameBoard => _gameBoard;
             public int GetDiskCount(Player.Disk disk)
@@ -178,7 +172,7 @@ namespace Othello.ViewModels
                 {
                     for (int j = 0; j < 8; j++)
                     {
-                        if (_boardState[i, j] == disk)
+                        if (GameBoard.Board[i, j] == disk)
                         {
                             count++;
                         }
@@ -188,9 +182,7 @@ namespace Othello.ViewModels
             }
             public void MakeComputerMove()
             {
-                int diskValue = _player2.PlayerDisk == Player.Disk.Black ? 0 : 1;
-
-                List<int[]> validMoves = _gameBoard.findValidMoves(diskValue);
+                List<int[]> validMoves = _gameBoard.findValidMoves(_player2.PlayerDisk);
 
                 if (validMoves.Count > 0)
                 {
@@ -206,9 +198,25 @@ namespace Othello.ViewModels
                 }
             }
         }
+        private void NotifyGameGridUpdate()
+        {
+            var boardState = _gameManager.GetBoardState();
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    GameGrid[i][j] = boardState[i, j] == Player.Disk.Black ? "Black" :
+                                     boardState[i, j] == Player.Disk.White ? "White" : "";
+                }
+            }
+        }
+
+
 
         public ObservableCollection<ObservableCollection<string>> GameGrid { get; set; }
         private string _currentPlayerName = "Player 1";
+
+
         public string CurrentPlayerName
         {
             get => _currentPlayerName;
@@ -239,24 +247,6 @@ namespace Othello.ViewModels
             }
         }
 
-        private void UpdateGameGrid()
-        {
-            Player.Disk[,] boardState = _gameManager.GetBoardState();
-
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    GameGrid[i][j] = boardState[i, j] switch
-                    {
-                        Player.Disk.Black => "B",
-                        Player.Disk.White => "W",
-                        _ => ""
-                    };
-                }
-            }
-        }
-
         private void UpdateScores()
         {
             BlackScore = _gameManager.GetDiskCount(Player.Disk.Black);
@@ -276,13 +266,20 @@ namespace Othello.ViewModels
 
                 if (_gameManager.CurrentPlayer is ComputerPlayer)
                 {
-                    await Task.Run(() => _gameManager.MakeComputerMove());
-                    UpdateGameGrid();
+                    await Task.Run(() =>
+                    {
+                        _gameManager.MakeComputerMove();
+                    });
+
+                    // Update the graphics on the UI thread
+                    Application.Current.Dispatcher.Invoke(() => NotifyGameGridUpdate());
+
                     UpdateScores();
                     await HandleNextTurn();
                 }
             }
         }
+
         public bool IsGameOver()
         {
             return false;
